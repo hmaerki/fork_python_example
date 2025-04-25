@@ -14,8 +14,6 @@ test-skip = "*universal2:arm64"
 build = "cp39-* cp313-*"
 # Disable building PyPy wheels on all platforms
 skip = "pp*"
-# Skip building on CPython 3.6 on all platforms
-skip = "cp36-*"
 
 [tool.ruff]
 target-version = "py313"
