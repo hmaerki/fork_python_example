@@ -75,6 +75,7 @@ jobs:
         pattern: cibw-*
         path: dist
         merge-multiple: true
+
     - uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__

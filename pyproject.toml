@@ -1,7 +1,7 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "pybind11>=2.10.0",
+    "setuptools==79.*",
+    "pybind11==2.13.*",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -12,7 +12,7 @@ test-skip = "*universal2:arm64"
 
 
 [tool.ruff]
-target-version = "py37"
+target-version = "py313"
 
 [tool.ruff.lint]
 extend-select = [
