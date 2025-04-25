@@ -13,12 +13,14 @@ test-skip = "*universal2:arm64"
 # See: https://cibuildwheel.pypa.io/en/stable/options/
 # Only build on CPython CPython 3.9 and 3.13
 build = "cp39-* cp313-*"
-# Skip CPython 3.6 and CPython 3.7
-skip = ["cp36-*", "cp37-*"]
-# Skip 32-bit builds
-skip = ["*-win32", "*-manylinux_i686"]
-# Disable building PyPy wheels on all platforms
-skip = "pp*"
+skip = [
+  # Skip CPython 3.6 and CPython 3.7
+  "cp36-*", "cp37-*",
+  # Skip 32-bit builds
+  "*-win32", "*-manylinux_i686",
+  # Disable building PyPy wheels on all platforms
+  "pp*",
+]
 
 [tool.ruff]
 target-version = "py313"
