@@ -53,13 +53,10 @@ jobs:
 
     - name: Build wheels
       run: python -m cibuildwheel --output-dir wheelhouse
-      env:
-        # Disable building PyPy wheels on all platforms
-        CIBW_SKIP: pp*
-        # Only build on CPython 3.9 and 3.13
-        CIBW_BUILD: cp39* cp313-*
-        # Skip building on CPython 3.6 on all platforms
-        CIBW_SKIP: cp36-*
+      # to supply options, put them in 'env', like:
+      # env:
+      #   CIBW_SOME_OPTION: value
+      #   ...
 
     - uses: actions/upload-artifact@v4
       with:

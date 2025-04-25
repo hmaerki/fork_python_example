@@ -10,6 +10,12 @@ build-backend = "setuptools.build_meta"
 test-command = "python {project}/tests/test.py"
 test-skip = "*universal2:arm64"
 
+# Only build on CPython CPython 3.9 and 3.13
+build = "cp39-* cp313-*"
+# Disable building PyPy wheels on all platforms
+skip = "pp*"
+# Skip building on CPython 3.6 on all platforms
+skip = "cp36-*"
 
 [tool.ruff]
 target-version = "py313"
