@@ -89,8 +89,11 @@ jobs:
           name: Create GitHub Release
           needs: [build_wheels, build_sdist]
           runs-on: ubuntu-latest
+          permissions:
+            contents: read
+            issues: write
+            
           steps:
-
           - name: Create Release
             uses: actions/create-release@v1
             with:
@@ -100,7 +103,6 @@ jobs:
                 This release includes the latest built wheels and source distribution.
               draft: true
               prerelease: true
-              # token: ${{ secrets.GITHUB_TOKEN }}
             env:
               GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
