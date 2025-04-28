@@ -1,6 +1,8 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "dynamic_buffer.h"
 
@@ -45,4 +47,22 @@ size_t DynamicBuffer::size() const
 const std::vector<unsigned int> &DynamicBuffer::get_buffer() const
 {
     return buffer;
+}
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(dynamic_buffer, m)
+{
+    py::class_<DynamicBuffer>(m, "DynamicBuffer")
+        .def(py::init<>()) // Default constructor
+        .def("begin_add", &DynamicBuffer::begin_add, py::arg("buf"), py::arg("len"),
+             "Adds elements to the buffer.")
+        .def("end_free", &DynamicBuffer::end_free, py::arg("len"),
+             "Removes elements from the end of the buffer.")
+        .def("find_last_zero", &DynamicBuffer::find_last_zero,
+             "Finds the last zero in the buffer and returns its index.")
+        .def("size", &DynamicBuffer::size,
+             "Returns the current size of the buffer.")
+        .def("get_buffer", &DynamicBuffer::get_buffer,
+             "Accesses the buffer for debugging or other purposes.");
 }
