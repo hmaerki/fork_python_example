@@ -54,20 +54,21 @@ public:
         return buffer;
     }
 };
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(dynamic_buffer, m)
 {
     py::class_<DynamicBuffer>(m, "DynamicBuffer")
-        .def(py::init<>()) // Default constructor
-        .def("begin_add", &begin_add, py::arg("buf"), py::arg("len"),
+        .def(py::init<>())
+        .def("begin_add", &DynamicBuffer::begin_add, py::arg("buf"), py::arg("len"),
              "Adds elements to the buffer.")
-        .def("end_free", &end_free, py::arg("len"),
+        .def("end_free", &DynamicBuffer::end_free, py::arg("len"),
              "Removes elements from the end of the buffer.")
-        .def("find_last_zero", &find_last_zero,
+        .def("find_last_zero", &DynamicBuffer::find_last_zero,
              "Finds the last zero in the buffer and returns its index.")
-        .def("size", &size,
+        .def("size", &DynamicBuffer::size,
              "Returns the current size of the buffer.")
-        .def("get_buffer", &get_buffer,
-             "Accesses the buffer for debugging or other purposes.");
+        .def("get_buffer", &DynamicBuffer::get_buffer,
+             "Returns the current buffer as a list.");
 }
