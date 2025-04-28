@@ -20,6 +20,8 @@ skip = [
   "cp36-*", "cp37-*",
   # Skip 32-bit builds
   "*-win32", "*_i686",
+  # Skip musllinux
+  "*-musllinux",
   # Disable building PyPy wheels on all platforms
   "pp*",
 ]

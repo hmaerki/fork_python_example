@@ -8,11 +8,11 @@
 class DynamicBuffer
 {
 private:
-    std::vector<unsigned int> buffer;
+    std::vector<unsigned char> buffer;
 
 public:
     // Adds elements to the buffer
-    void begin_add(const unsigned int *buf, size_t len)
+    void begin_add(const unsigned char *buf, size_t len)
     {
         if (!buf || len == 0)
         {
@@ -49,7 +49,7 @@ public:
     }
 
     // Optional: Access the buffer for debugging or other purposes
-    const std::vector<unsigned int> &get_buffer() const
+    const std::vector<unsigned char> &get_buffer() const
     {
         return buffer;
     }
@@ -61,7 +61,6 @@ PYBIND11_MODULE(dynamic_buffer, m)
 {
     py::class_<DynamicBuffer>(m, "DynamicBuffer")
         .def(py::init<>())
-        .def("begin_add", &DynamicBuffer::begin_add, py::arg("buf"), py::arg("len"),
              "Adds elements to the buffer.")
         .def("end_free", &DynamicBuffer::end_free, py::arg("len"),
              "Removes elements from the end of the buffer.")
