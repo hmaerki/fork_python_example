@@ -20,6 +20,12 @@ ext_modules = [
         # Example: passing in the version to the compiled code
         define_macros=[("VERSION_INFO", __version__)],
     ),
+    Pybind11Extension(
+        "dynamic_buffer",
+        ["src/dynamic_buffer.cpp"],
+        # Example: passing in the version to the compiled code
+        define_macros=[("VERSION_INFO", __version__)],
+    ),
 ]
 
 setup(
