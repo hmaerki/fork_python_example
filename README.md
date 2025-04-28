@@ -67,6 +67,20 @@ terms and conditions of this license.
 Test call
 ---------
 
+```bash
+uv venv --python 3.13.3 .venv
+
+download cibw-wheels-ubuntu-latest-0.zip
+
+uv pip install python_example-0.0.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+```
+
+```python
+from dynamic_buffer import DynamicBuffer
+db = DynamicBuffer()
+```
+
+
 ```python
 import python_example
 python_example.add(1, 2)
