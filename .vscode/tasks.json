@@ -13,11 +13,10 @@
                 "-o",
                 "bin/dynamic_buffer_main"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": ["$gcc"],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
             "detail": "Task to build dynamic_buffer_main.cpp and dynamic_buffer.cpp."
         }
     ]

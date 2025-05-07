@@ -1,3 +1,35 @@
+/*
+front/back: https://www.programiz.com/cpp-programming/vectors
+
+https://docs.python.org/3/library/queue.html
+  * put() Add to front
+  * get() Get from end
+
+Interface
+  * put(buf: bytes)
+  * get()
+    None: No data yet
+    status byte, numpy array
+      In this case, the buffer is shrinked. memove?
+
+Loop over 3 bytes.
+Update CRC.
+
+Convert values for numpy, byte order.
+return buffer in format which fits for numpy.
+
+Where to calculate gain? numpy?
+
+dynamic buffer -> unsigned int 32 bit -> numpy (32bit) -> numpy (float)
+
+
+z = np.arange(3, dtype=np.uint8)
+z
+
+https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.uint32
+https://numpy.org/doc/stable/reference/c-api/dtype.html#c.npy_uint32
+
+*/
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
@@ -61,6 +93,7 @@ PYBIND11_MODULE(dynamic_buffer, m)
 {
     py::class_<DynamicBuffer>(m, "DynamicBuffer")
         .def(py::init<>())
+        .def("begin_add", &DynamicBuffer::begin_add, py::arg("buf"), py::arg("len"),
              "Adds elements to the buffer.")
         .def("end_free", &DynamicBuffer::end_free, py::arg("len"),
              "Removes elements from the end of the buffer.")
