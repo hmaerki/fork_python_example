@@ -65,13 +65,13 @@ public:
 
         // pybind11::array_t<double> narray = {};
 
-        ssize_t size = 4;
+        size_t size = 4;
         py::array_t<double> narray(size);
         // Obtain mutable access to the array
         auto r = narray.mutable_unchecked<1>();
 
         // Populate the array with values
-        for (ssize_t i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             r(i) = 1.001001 * static_cast<double>(1+i);
         }
 
@@ -99,7 +99,7 @@ public:
     }
 
     // Finds the last zero in the buffer and returns its index
-    int find_last_zero() const
+    size_t find_last_zero() const
     {
         auto it = std::find(buffer.rbegin(), buffer.rend(), 0);
         if (it == buffer.rend())
