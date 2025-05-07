@@ -36,13 +36,48 @@ https://numpy.org/doc/stable/reference/c-api/dtype.html#c.npy_uint32
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+// https://medium.com/@ahmedfgad/handling-python-numpy-arrays-in-c-using-pybind11-0b7450f4f4b3
+#include <pybind11/numpy.h>
+
+namespace py = pybind11;
 
 class DynamicBuffer
 {
 private:
     std::vector<unsigned char> buffer;
+    std::string buf;
 
 public:
+    void add_bytes(std::string buf) {
+        printf("This is buf:\n");
+        printf("  %ld\n", buf.length());
+        printf("  %s\n", buf.c_str());
+        this->buf = buf;
+    }
+
+    py::bytes get_bytes( ) {
+        printf("Returning buf\n");
+        return this->buf;
+    }
+
+    pybind11::array_t<double> get_numpy_array( ) {
+        printf("Returning numpy array\n");
+
+        // pybind11::array_t<double> narray = {};
+
+        ssize_t size = 4;
+        py::array_t<double> narray(size);
+        // Obtain mutable access to the array
+        auto r = narray.mutable_unchecked<1>();
+
+        // Populate the array with values
+        for (ssize_t i = 0; i < size; i++) {
+            r(i) = 1.001001 * static_cast<double>(1+i);
+        }
+
+        return narray;
+    }
+
     // Adds elements to the buffer
     void begin_add(const unsigned char *buf, size_t len)
     {
@@ -87,12 +122,19 @@ public:
     }
 };
 
-namespace py = pybind11;
 
 PYBIND11_MODULE(dynamic_buffer, m)
 {
     py::class_<DynamicBuffer>(m, "DynamicBuffer")
         .def(py::init<>())
+        .def("add_bytes", &DynamicBuffer::add_bytes, py::arg("buf"),
+             "Adds elements to the buffer.")
+        .def("get_bytes", &DynamicBuffer::get_bytes,
+             "Return bytesbytes.")
+
+        .def("get_numpy_array", &DynamicBuffer::get_numpy_array,
+            "Return numarray.")
+
         .def("begin_add", &DynamicBuffer::begin_add, py::arg("buf"), py::arg("len"),
              "Adds elements to the buffer.")
         .def("end_free", &DynamicBuffer::end_free, py::arg("len"),
