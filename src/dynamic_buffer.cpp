@@ -56,27 +56,43 @@ private:
 public:
     void push_bytes(std::string buf)
     {
-        printf("This is buf:\n");
-        printf("  %ld\n", buf.length());
-        printf("  %s\n", buf.c_str());
+        // printf("This is buf:\n");
+        // printf("  %ld\n", buf.length());
+        // printf("  %s\n", buf.c_str());
         buffer.insert(buffer.begin(), buf.begin(), buf.end());
     }
 
-    pybind11::array_t<uint32_t> get_numpy_array()
+    pybind11::array_t<int32_t> get_numpy_array()
     {
-        printf("Returning numpy array\n");
+        // printf("Returning numpy array\n");
 
         // pybind11::array_t<double> narray = {};
 
-        size_t size = 4;
-        py::array_t<uint32_t> narray(size);
+        if ((buffer.size() % 3) != 0)
+        {
+            printf("WARNING: size=%ld which is not a multiple of 3!\n", buffer.size());
+        }
+        size_t measurement_count = buffer.size() / 3;
+        py::array_t<int32_t> narray(measurement_count);
+
         // Obtain mutable access to the array
-        auto r = narray.mutable_unchecked<1>();
+        auto narray_uncheckec = narray.mutable_unchecked<1>();
 
         // Populate the array with values
-        for (size_t i = 0; i < size; i++)
+        for (size_t i = 0; i < measurement_count; i++)
         {
-            r(i) = 1.001001 * static_cast<uint32_t>(1 + i);
+            int32_t measurement_value = 0;
+            for (size_t j = 0; j < 3; j++)
+            {
+                measurement_value <<= 8;
+                measurement_value += buffer[3 * i + j];
+            }
+            if (measurement_value & 0x800000)
+            {
+                measurement_value -= 0x1000000;
+            }
+
+            narray_uncheckec(i) = static_cast<int32_t>(measurement_value);
         }
 
         return narray;
@@ -132,9 +148,8 @@ PYBIND11_MODULE(dynamic_buffer, m)
 #endif
 }
 
-
 #ifdef MAIN
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     DynamicBuffer buffer;
     {
