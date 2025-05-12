@@ -23,18 +23,18 @@ ext_modules = [
 ]
 
 setup(
-    name="python_example",
+    name="dynamic_buffer",
     version=__version__,
     author="Sylvain Corlay",
     author_email="sylvain.corlay@gmail.com",
     url="https://github.com/pybind/python_example",
-    description="A test project using pybind11",
+    description="dynamic_buffer for ad_low_noise_float_2023_git",
     long_description="",
     ext_modules=ext_modules,
-    extras_require={"test": "pytest"},
+    # extras_require={"test": "pytest"},
     # Currently, build_ext only provides an optional "highest supported C++
     # level" feature, but in the future it may provide more features.
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    python_requires=">=3.7",
+    python_requires=">=3.9",
 )

@@ -1,3 +1,12 @@
+[project]
+name = "dynamic_buffer"
+description = "dynamic_buffer for ad_low_noise_float_2023_git"
+requires-python = ">=3.9.0"
+version = "0.1.0"
+dependencies = [
+  "numpy>=2.0.0",
+]
+
 [build-system]
 requires = [
     "setuptools>=42",
