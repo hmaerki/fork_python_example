@@ -54,6 +54,7 @@ namespace py = pybind11;
 #define CHECK_STATUS 3
 #define CHECK_CRC 4
 #define CHECK_SPARE 5
+#define SEPARATOR_SIZE 6
 
 class DynamicBuffer
 {
@@ -81,28 +82,24 @@ private:
 public:
     void push_bytes(std::string buf)
     {
-        // printf("This is buf:\n");
-        // printf("  %ld\n", buf.length());
-        // printf("  %s\n", buf.c_str());
-        // buffer.insert(buffer.begin(), buf.begin(), buf.end());
         buffer.insert(buffer.end(), buf.begin(), buf.end());
     }
 
     // Returns: pybind11::array_t<int32_t>
     py::object get_numpy_array()
     {
-        int32_t first_separator = find_first_separator();
-        if (first_separator == 0)
+        int32_t index_first_separator = find_first_separator();
+        if (index_first_separator == 0)
         {
             // Need more data
             return py::none();
         }
 
-        if ((buffer.size() % 3) != 0)
+        if ((index_first_separator % 3) != 0)
         {
-            printf("WARNING: size=%ld which is not a multiple of 3!\n", buffer.size());
+            printf("WARNING: index_first_separator=%d which is not a multiple of 3!\n", index_first_separator);
         }
-        size_t measurement_count = buffer.size() / 3;
+        size_t measurement_count = index_first_separator / 3;
         py::array_t<int32_t> narray(measurement_count);
 
         // Obtain mutable access to the array
@@ -125,7 +122,7 @@ public:
             narray_uncheckec(i) = static_cast<int32_t>(measurement_value);
         }
 
-        
+        buffer.erase(buffer.begin(), buffer.begin() + index_first_separator + SEPARATOR_SIZE);
 
         return narray;
     }
@@ -156,9 +153,9 @@ public:
         return buffer.size();
     }
 
-    std::string get_buffer()
+    py::bytes get_buffer()
     {
-        return std::string(buffer.begin(), buffer.end());
+        return py::bytes(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     }
 };
 
