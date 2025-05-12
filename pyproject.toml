@@ -13,8 +13,8 @@ test-requires = "numpy>=2.0.0"
 
 # See: https://cibuildwheel.pypa.io/en/stable/options/
 build = [
-  # Only build on CPython CPython 3.9 and 3.13
-  "cp39-*", "cp313-*",
+  # Only build on CPython CPython 3.9 and 3.12
+  "cp39-*", "cp312-*", "cp313-*",
 ]
 skip = [
   # Skip CPython 3.6 and CPython 3.7
