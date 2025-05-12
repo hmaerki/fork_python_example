@@ -51,25 +51,27 @@ namespace py = pybind11;
 #define SEPARATOR_0 0
 #define SEPARATOR_1 1
 #define SEPARATOR_2 2
-#define CHECK_STATUS 3
-#define CHECK_CRC 4
-#define CHECK_SPARE 5
+#define STATUS_ERRORS 3
+#define STATUS_CRC 4
+#define STATUS_SPARE 5
 #define SEPARATOR_SIZE 6
 
 class DynamicBuffer
 {
 private:
+    uint8_t crc = 0xFF;
+    uint8_t errors = 0xFF;
     std::vector<unsigned char> buffer;
 
     // Finds the next separator and returns its index
     // return 0: no separator found
-    int32_t find_first_separator() const
+    inline int32_t find_first_separator() const
     {
-        int32_t last = buffer.size() - CHECK_SPARE;
+        int32_t last = buffer.size() - STATUS_SPARE;
         for (int32_t i = 0; i < last; i += 3)
         {
             // Fast early rejection
-            if (buffer[i + SEPARATOR_0] | buffer[i + SEPARATOR_1] | buffer[i + SEPARATOR_2] | buffer[i + CHECK_SPARE])
+            if (buffer[i + SEPARATOR_0] | buffer[i + SEPARATOR_1] | buffer[i + SEPARATOR_2] | buffer[i + STATUS_SPARE])
             {
                 continue;
             }
@@ -79,10 +81,22 @@ private:
         return 0; // No separator
     }
 
+    inline int8_t calculate_crc(int32_t index_first_separator) const
+    {
+        int8_t crc = 0;
+        for (int32_t i = 0; i < index_first_separator + STATUS_SPARE; i++)
+        {
+            crc ^= buffer[i];
+        }
+        return crc;
+    }
+
 public:
     void push_bytes(std::string buf)
     {
         buffer.insert(buffer.end(), buf.begin(), buf.end());
+        crc = 0xFF;
+        errors = 0xFF;
     }
 
     // Returns: pybind11::array_t<int32_t>
@@ -91,9 +105,14 @@ public:
         int32_t index_first_separator = find_first_separator();
         if (index_first_separator == 0)
         {
+            crc = 0xFF;
+            errors = 0xFF;
             // Need more data
             return py::none();
         }
+
+        crc = calculate_crc(index_first_separator);
+        errors = buffer[index_first_separator + STATUS_ERRORS];
 
         if ((index_first_separator % 3) != 0)
         {
@@ -136,6 +155,14 @@ public:
     {
         return py::bytes(reinterpret_cast<const char *>(buffer.data()), buffer.size());
     }
+    uint8_t get_crc()
+    {
+        return crc;
+    }
+    uint8_t get_errors()
+    {
+        return errors;
+    }
 };
 
 PYBIND11_MODULE(dynamic_buffer, m)
@@ -148,6 +175,10 @@ PYBIND11_MODULE(dynamic_buffer, m)
              "Return numarray.")
         .def("size", &DynamicBuffer::size,
              "Returns the current size of the buffer.")
+        .def("get_crc", &DynamicBuffer::get_crc,
+             "get_crc.")
+        .def("get_errors", &DynamicBuffer::get_errors,
+             "get_errors.")
         .def("get_buffer", &DynamicBuffer::get_buffer,
              "Returns the buffer.");
 

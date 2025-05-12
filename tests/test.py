@@ -4,6 +4,9 @@ from contextlib import contextmanager
 
 assert dynamic_buffer.__version__ == "0.0.1"
 
+ERROR_BITS = 0x42
+
+
 list_measurements_2 = [
     0x3F,
     0x30,
@@ -36,8 +39,8 @@ list_separator_2 = [
     0x00,
     0x00,
     0x00,  # 1 measurement
-    0x42,  # error bits
-    0x43,  # crc
+    ERROR_BITS,  # error bits
+    0x00,  # crc
     0x00,  # 1 measurement
 ]
 
@@ -68,10 +71,15 @@ def expect_size(db: dynamic_buffer.DynamicBuffer, expected_size: int) -> None:
         dump(db=db)
     assert success, (db.size(), expected_size)
 
+
 def assert_list_equal(numpy_array, list_values):
     assert len(numpy_array) == len(list_values), (len(numpy_array), len(list_values))
     for n, v in zip(numpy_array, list_values, strict=True):
         assert n == v, (n, v)
+
+
+def assert_crc(db: dynamic_buffer.DynamicBuffer, crc: int):
+    assert db.get_crc() == crc, (db.get_crc(), crc)
 
 
 @contextmanager
@@ -90,9 +98,9 @@ def test_context(
         # print(f"Done: {msg}")
 
 
-
 def test_normal_data():
     db = dynamic_buffer.DynamicBuffer()
+    assert_crc(db, 0xFF)
 
     db.push_bytes(bytes(list_measurements_2))
     with test_context(db, 6, 6, "Not sufficient data"):
@@ -104,10 +112,13 @@ def test_normal_data():
         numpy_array = db.get_numpy_array()
         assert numpy_array is not None, numpy_array
         assert len(numpy_array) == 2
+        assert_crc(db, 111)
+        assert db.get_errors() == ERROR_BITS, (db.get_errors(), ERROR_BITS)
 
 
 def test_normal_data_iterator():
     db = dynamic_buffer.DynamicBuffer()
+    assert_crc(db, 0xFF)
 
     db.push_bytes(
         bytes(
@@ -117,8 +128,9 @@ def test_normal_data_iterator():
             + list_separator_2
         )
     )
-    with test_context(db, 3 * (5 + 2 + 2 + 2), 3 * (2 + 2), "iterator 1"):
+    with test_context(db, 3 * (5 + 2 + 2 + 2), 3 * (2 + 2), "Iterator 1"):
         numpy_array = db.get_numpy_array()
+        assert_crc(db, 223)
         assert_list_equal(numpy_array, list_measurements_5_values)
         # for measurement_signed in numpy_array:
         #     REF_V = 5.0
@@ -126,9 +138,15 @@ def test_normal_data_iterator():
         #     measurement_V = measurement_signed / (2**23) * REF_V / GAIN
         #     print(measurement_signed, measurement_V)
 
-    with test_context(db, 3 * (2 + 2), 0, "iterator 2"):
+    with test_context(db, 3 * (2 + 2), 0, "Iterator 2"):
         numpy_array = db.get_numpy_array()
+        assert_crc(db, 111)
         assert_list_equal(numpy_array, list_measurements_2_values)
+
+    with test_context(db, 0, 0, "Iterator 3"):
+        numpy_array = db.get_numpy_array()
+        assert_crc(db, 0xFF)
+        assert numpy_array is None, numpy_array
 
 
 if __name__ == "__main__":
