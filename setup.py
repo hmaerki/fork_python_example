@@ -1,6 +1,6 @@
 # Available at setup time due to pyproject.toml
+import setuptools
 from pybind11.setup_helpers import Pybind11Extension, build_ext
-from setuptools import setup
 
 __version__ = "0.0.1"
 
@@ -22,12 +22,12 @@ ext_modules = [
     ),
 ]
 
-setup(
+setuptools.setup(
     name="dynamic_buffer",
     version=__version__,
-    author="Sylvain Corlay",
-    author_email="sylvain.corlay@gmail.com",
-    url="https://github.com/pybind/python_example",
+    author="Hans Maerki",
+    author_email="buhtig.hans.maerki@ergoinfo.ch",
+    url="https://github.com/petermaerki/ad_low_noise_float_2023_git/",
     description="dynamic_buffer for ad_low_noise_float_2023_git",
     long_description="",
     ext_modules=ext_modules,
