@@ -69,7 +69,14 @@
 			"cinttypes": "cpp",
 			"typeinfo": "cpp",
 			"variant": "cpp",
-			"valarray": "cpp"
+			"valarray": "cpp",
+			"chrono": "cpp",
+			"codecvt": "cpp",
+			"forward_list": "cpp",
+			"set": "cpp",
+			"unordered_set": "cpp",
+			"iomanip": "cpp",
+			"typeindex": "cpp"
 		}
 	}
 }

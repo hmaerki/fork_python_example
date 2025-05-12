@@ -48,10 +48,35 @@ https://numpy.org/doc/stable/reference/c-api/dtype.html#c.npy_uint32
 
 namespace py = pybind11;
 
+#define SEPARATOR_0 0
+#define SEPARATOR_1 1
+#define SEPARATOR_2 2
+#define CHECK_STATUS 3
+#define CHECK_CRC 4
+#define CHECK_SPARE 5
+
 class DynamicBuffer
 {
 private:
     std::vector<unsigned char> buffer;
+
+    // Finds the next separator and returns its index
+    // return 0: no separator found
+    int32_t find_first_separator() const
+    {
+        int32_t last = buffer.size() - CHECK_SPARE;
+        for (int32_t i = 0; i < last; i += 3)
+        {
+            // Fast early rejection
+            if (buffer[i + SEPARATOR_0] | buffer[i + SEPARATOR_1] | buffer[i + SEPARATOR_2] | buffer[i + CHECK_SPARE])
+            {
+                continue;
+            }
+
+            return i;
+        }
+        return 0; // No separator
+    }
 
 public:
     void push_bytes(std::string buf)
@@ -59,14 +84,19 @@ public:
         // printf("This is buf:\n");
         // printf("  %ld\n", buf.length());
         // printf("  %s\n", buf.c_str());
-        buffer.insert(buffer.begin(), buf.begin(), buf.end());
+        // buffer.insert(buffer.begin(), buf.begin(), buf.end());
+        buffer.insert(buffer.end(), buf.begin(), buf.end());
     }
 
-    pybind11::array_t<int32_t> get_numpy_array()
+    // Returns: pybind11::array_t<int32_t>
+    py::object get_numpy_array()
     {
-        // printf("Returning numpy array\n");
-
-        // pybind11::array_t<double> narray = {};
+        int32_t first_separator = find_first_separator();
+        if (first_separator == 0)
+        {
+            // Need more data
+            return py::none();
+        }
 
         if ((buffer.size() % 3) != 0)
         {
@@ -95,6 +125,8 @@ public:
             narray_uncheckec(i) = static_cast<int32_t>(measurement_value);
         }
 
+        
+
         return narray;
     }
 
@@ -119,10 +151,14 @@ public:
         return std::distance(buffer.begin(), it.base()) - 1;
     }
 
-    // Optional: Get the current size of the buffer
     size_t size() const
     {
         return buffer.size();
+    }
+
+    std::string get_buffer()
+    {
+        return std::string(buffer.begin(), buffer.end());
     }
 };
 
@@ -139,7 +175,9 @@ PYBIND11_MODULE(dynamic_buffer, m)
         .def("find_last_zero", &DynamicBuffer::find_last_zero,
              "Finds the last zero in the buffer and returns its index.")
         .def("size", &DynamicBuffer::size,
-             "Returns the current size of the buffer.");
+             "Returns the current size of the buffer.")
+        .def("get_buffer", &DynamicBuffer::get_buffer,
+             "Returns the buffer.");
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
