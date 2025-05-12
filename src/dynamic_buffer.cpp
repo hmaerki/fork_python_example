@@ -127,27 +127,6 @@ public:
         return narray;
     }
 
-    // Removes elements from the end of the buffer
-    void end_free(size_t len)
-    {
-        if (len > buffer.size())
-        {
-            throw std::out_of_range("Length to free exceeds buffer size.");
-        }
-        buffer.erase(buffer.end() - len, buffer.end());
-    }
-
-    // Finds the last zero in the buffer and returns its index
-    size_t find_last_zero() const
-    {
-        auto it = std::find(buffer.rbegin(), buffer.rend(), 0);
-        if (it == buffer.rend())
-        {
-            return -1; // Return -1 if no zero is found
-        }
-        return std::distance(buffer.begin(), it.base()) - 1;
-    }
-
     size_t size() const
     {
         return buffer.size();
@@ -155,7 +134,7 @@ public:
 
     py::bytes get_buffer()
     {
-        return py::bytes(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+        return py::bytes(reinterpret_cast<const char *>(buffer.data()), buffer.size());
     }
 };
 
@@ -167,10 +146,6 @@ PYBIND11_MODULE(dynamic_buffer, m)
              "Adds elements to the begin of the buffer.")
         .def("get_numpy_array", &DynamicBuffer::get_numpy_array,
              "Return numarray.")
-        .def("end_free", &DynamicBuffer::end_free, py::arg("len"),
-             "Removes elements from the end of the buffer.")
-        .def("find_last_zero", &DynamicBuffer::find_last_zero,
-             "Finds the last zero in the buffer and returns its index.")
         .def("size", &DynamicBuffer::size,
              "Returns the current size of the buffer.")
         .def("get_buffer", &DynamicBuffer::get_buffer,
