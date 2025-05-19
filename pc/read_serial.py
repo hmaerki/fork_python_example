@@ -1,6 +1,7 @@
+import time
+
 import serial
 import serial.tools.list_ports
-import time
 
 VID = 0x2E8A
 PID = 0x4242

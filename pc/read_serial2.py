@@ -1,9 +1,7 @@
-import serial
-import serial.tools.list_ports
 import time
-import dynamic_buffer
 
-from read_serial import VID, PID, open_serial_port, BUFFER_SIZE
+import dynamic_buffer
+from read_serial import BUFFER_SIZE, PID, VID, open_serial_port
 
 
 def main():
@@ -19,20 +17,20 @@ def main():
         measurements = port.read(size=BUFFER_SIZE)
         counter += len(measurements) // 3
         duration_ns = time.monotonic_ns() - begin_ns
-        print(f"{len(measurements)=}, duration_s={duration_ns/1e9}")
-        print(f"{1e9*counter/duration_ns:0.1f} SPS")
+        print(f"{1e9*counter/duration_ns:0.1f} SPS {len(measurements)=}, duration_s={duration_ns/1e9}")
 
         db.push_bytes(measurements)
         while True:
             numpy_array = db.get_numpy_array()
             if numpy_array is None:
-                if counter != counter_after_db:
-                    print(
-                        f"counter != counter_after_db: {counter} != {counter_after_db}"
+                print(
+                        f"   counter != counter_after_db: {counter} != {counter_after_db} + {counter-counter_after_db}"
                     )
                 break
             if db.get_crc() != 0:
-                print(f"crc={db.get_crc()}")
+                print(f"ERROR crc={db.get_crc()}")
+            if db.get_errors() != 72:
+                print(f"ERROR errors={db.get_errors()}")
             # print(db.get_errors())
             counter_after_db += len(numpy_array)
             for measurement_signed in numpy_array:

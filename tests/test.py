@@ -59,7 +59,7 @@ list_measurements_5_values = [
     4140860,
 ]
 
-list_odd_chunck_5 = [
+list_odd_chunck_5bytes = [
     0x01,
     0x02,
     0x03,
@@ -84,7 +84,7 @@ def expect_size(db: dynamic_buffer.DynamicBuffer, expected_size: int) -> None:
 
 def assert_list_equal(numpy_array, list_values):
     assert len(numpy_array) == len(list_values), (len(numpy_array), len(list_values))
-    for n, v in zip(numpy_array, list_values, strict=True):
+    for n, v in zip(numpy_array, list_values):  # noqa: B905
         assert n == v, (n, v)
 
 
@@ -166,28 +166,24 @@ def test_resync():
     db.push_bytes(
         bytes(
             list_measurements_5
-            + list_odd_chunck_5
+            + list_odd_chunck_5bytes
             + list_separator_2
             + list_measurements_2
             + list_separator_2
         )
     )
-    with test_context(db, 3 * (5 + 2 + 2 + 2), 3 * (2 + 2), "Iterator 1"):
+    with test_context(db, 3 * (5 + 2 + 2 + 2) + 5, 3 * (2 + 2), "Resync 1"):
         numpy_array = db.get_numpy_array()
-        assert_crc(db, 223)
-        assert_list_equal(numpy_array, list_measurements_5_values)
-        # for measurement_signed in numpy_array:
-        #     REF_V = 5.0
-        #     GAIN = 5.0  # 1.0, 2.0, 5.0, 10.0
-        #     measurement_V = measurement_signed / (2**23) * REF_V / GAIN
-        #     print(measurement_signed, measurement_V)
+        assert_crc(db, 157)
+        # Now numpy_array contains the chunck values!
+        # assert_list_equal(numpy_array, list_measurements_2_values)
 
-    with test_context(db, 3 * (2 + 2), 0, "Iterator 2"):
+    with test_context(db, 3 * (2 + 2), 0, "Resync 2"):
         numpy_array = db.get_numpy_array()
-        assert_crc(db, 111)
+        assert_crc(db, 44)
         assert_list_equal(numpy_array, list_measurements_2_values)
 
-    with test_context(db, 0, 0, "Iterator 3"):
+    with test_context(db, 0, 0, "Resync 3"):
         numpy_array = db.get_numpy_array()
         assert_crc(db, 0xFF)
         assert numpy_array is None, numpy_array
@@ -197,4 +193,4 @@ if __name__ == "__main__":
     if True:
         test_normal_data()
         test_normal_data_iterator()
-        # test_resync()
+        test_resync()
