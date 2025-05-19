@@ -67,8 +67,21 @@ private:
     // return 0: no separator found
     inline int32_t find_first_separator() const
     {
+        /*
         int32_t last = buffer.size() - STATUS_SPARE;
         for (int32_t i = 0; i < last; i += 3)
+        {
+            // Fast early rejection
+            if (buffer[i + SEPARATOR_0] | buffer[i + SEPARATOR_1] | buffer[i + SEPARATOR_2] | buffer[i + STATUS_SPARE])
+            {
+                continue;
+            }
+
+            return i;
+        }
+        */
+        int32_t last = buffer.size() - STATUS_SPARE;
+        for (int32_t i = 0; i < last; i++)
         {
             // Fast early rejection
             if (buffer[i + SEPARATOR_0] | buffer[i + SEPARATOR_1] | buffer[i + SEPARATOR_2] | buffer[i + STATUS_SPARE])

@@ -71,6 +71,7 @@ Test call
 # uv venv --python 3.13.3 .venv
 uv venv --python 3.12.7 .venv
 
+uv pip install -e .
 download cibw-wheels-ubuntu-latest-0.zip
 
 uv pip install python_example-0.0.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
