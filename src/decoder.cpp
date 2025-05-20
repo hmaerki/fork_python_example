@@ -4,10 +4,6 @@
 #include <algorithm>
 #include <stdexcept>
 
-#ifdef MAIN
-#include <iostream>
-#endif // MAIN
-
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 // https://medium.com/@ahmedfgad/handling-python-numpy-arrays-in-c-using-pybind11-0b7450f4f4b3
@@ -171,40 +167,3 @@ PYBIND11_MODULE(ad_low_noise_float_2023_decoder, m)
     m.attr("__version__") = "dev";
 #endif
 }
-
-#ifdef MAIN
-int main(int argc, char *argv[])
-{
-    Decoder buffer;
-    {
-        const unsigned char buf[] = {0, 1, 2, 3, 4, 5};
-        std::string str_buf(reinterpret_cast<const char *>(buf), sizeof(buf));
-        buffer.push_bytes(str_buf);
-    }
-
-    {
-        const unsigned char buf[] = {6, 7, 8, 9, 10, 11};
-        std::string str_buf(reinterpret_cast<const char *>(buf), sizeof(buf));
-        buffer.push_bytes(str_buf);
-    }
-
-    {
-        const unsigned char buf[] = {0x12, 0x13, 0, 0, 0, 17, 18, 19};
-        std::string str_buf(reinterpret_cast<const char *>(buf), sizeof(buf));
-        buffer.push_bytes(str_buf);
-    }
-
-    /*
-    const auto &buf = buffer.get_numpy_array();
-    std::cout << "Buffer contents: ";
-    for (unsigned char byte : buf)
-    {
-        std::cout << "0x" << std::hex << static_cast<int>(byte) << " ";
-    }
-    */
-    std::cout << std::dec << std::endl; // Reset to decimal format
-    std::cout << "size: " << buffer.size() << std::endl;
-    std::cout << "find_last_zero: " << buffer.find_last_zero() << std::endl;
-    return 0;
-}
-#endif
