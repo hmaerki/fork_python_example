@@ -15,16 +15,16 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Debug dynamic_buffer",
+            "name": "Debug ad_low_noise_float_2023_decoder",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/dynamic_buffer",
+            "program": "${workspaceFolder}/bin/decoder",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "Build dynamic_buffer",
+            "preLaunchTask": "Build ad_low_noise_float_2023_decoder",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

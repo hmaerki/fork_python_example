@@ -1,6 +1,6 @@
 import time
 
-import dynamic_buffer
+import ad_low_noise_float_2023_decoder
 from read_serial import BUFFER_SIZE, PID, VID, open_serial_port
 
 
@@ -12,26 +12,26 @@ def main():
     begin_ns = time.monotonic_ns()
     counter = 0
     counter_after_db = 0
-    db = dynamic_buffer.DynamicBuffer()
+    decoder = ad_low_noise_float_2023_decoder.Decoder()
     while True:
         measurements = port.read(size=BUFFER_SIZE)
         counter += len(measurements) // 3
         duration_ns = time.monotonic_ns() - begin_ns
         print(f"{1e9*counter/duration_ns:0.1f} SPS {len(measurements)=}, duration_s={duration_ns/1e9}")
 
-        db.push_bytes(measurements)
+        decoder.push_bytes(measurements)
         while True:
-            numpy_array = db.get_numpy_array()
+            numpy_array = decoder.get_numpy_array()
             if numpy_array is None:
                 print(
                         f"   counter != counter_after_db: {counter} != {counter_after_db} + {counter-counter_after_db}"
                     )
                 break
-            if db.get_crc() != 0:
-                print(f"ERROR crc={db.get_crc()}")
-            if db.get_errors() != 72:
-                print(f"ERROR errors={db.get_errors()}")
-            # print(db.get_errors())
+            if decoder.get_crc() != 0:
+                print(f"ERROR crc={decoder.get_crc()}")
+            if decoder.get_errors() != 72:
+                print(f"ERROR errors={decoder.get_errors()}")
+            # print(decoder.get_errors())
             counter_after_db += len(numpy_array)
             for measurement_signed in numpy_array:
                 REF_V = 5.0

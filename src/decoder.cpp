@@ -1,34 +1,4 @@
 /*
-front/back: https://www.programiz.com/cpp-programming/vectors
-
-https://docs.python.org/3/library/queue.html
-  * put() Add to front
-  * get() Get from end
-
-Interface
-  * put(buf: bytes)
-  * get()
-    None: No data yet
-    status byte, numpy array
-      In this case, the buffer is shrinked. memove?
-
-Loop over 3 bytes.
-Update CRC.
-
-Convert values for numpy, byte order.
-return buffer in format which fits for numpy.
-
-Where to calculate gain? numpy?
-
-dynamic buffer -> unsigned int 32 bit -> numpy (32bit) -> numpy (float)
-
-
-z = np.arange(3, dtype=np.uint8)
-z
-
-https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.uint32
-https://numpy.org/doc/stable/reference/c-api/dtype.html#c.npy_uint32
-
 */
 #include <vector>
 #include <algorithm>
@@ -56,7 +26,7 @@ namespace py = pybind11;
 #define STATUS_SPARE 5
 #define SEPARATOR_SIZE 6
 
-class DynamicBuffer
+class Decoder
 {
 private:
     uint8_t crc = 0xFF;
@@ -178,21 +148,21 @@ public:
     }
 };
 
-PYBIND11_MODULE(dynamic_buffer, m)
+PYBIND11_MODULE(ad_low_noise_float_2023_decoder, m)
 {
-    py::class_<DynamicBuffer>(m, "DynamicBuffer")
+    py::class_<Decoder>(m, "Decoder")
         .def(py::init<>())
-        .def("push_bytes", &DynamicBuffer::push_bytes, py::arg("buf"),
+        .def("push_bytes", &Decoder::push_bytes, py::arg("buf"),
              "Adds elements to the begin of the buffer.")
-        .def("get_numpy_array", &DynamicBuffer::get_numpy_array,
+        .def("get_numpy_array", &Decoder::get_numpy_array,
              "Return numarray.")
-        .def("size", &DynamicBuffer::size,
+        .def("size", &Decoder::size,
              "Returns the current size of the buffer.")
-        .def("get_crc", &DynamicBuffer::get_crc,
+        .def("get_crc", &Decoder::get_crc,
              "get_crc.")
-        .def("get_errors", &DynamicBuffer::get_errors,
+        .def("get_errors", &Decoder::get_errors,
              "get_errors.")
-        .def("get_buffer", &DynamicBuffer::get_buffer,
+        .def("get_buffer", &Decoder::get_buffer,
              "Returns the buffer.");
 
 #ifdef VERSION_INFO
@@ -205,7 +175,7 @@ PYBIND11_MODULE(dynamic_buffer, m)
 #ifdef MAIN
 int main(int argc, char *argv[])
 {
-    DynamicBuffer buffer;
+    Decoder buffer;
     {
         const unsigned char buf[] = {0, 1, 2, 3, 4, 5};
         std::string str_buf(reinterpret_cast<const char *>(buf), sizeof(buf));

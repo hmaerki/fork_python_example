@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build dynamic_buffer",
+            "label": "Build ad_low_noise_float_2023_decoder",
             "type": "shell",
             "command": "/usr/bin/g++-14",
             // "command": "/usr/bin/gcc",
@@ -17,13 +17,13 @@
                 "-std=c++17",
                 "-fPIC",
                 // python -m pybind11 --includes
-                "-I/home/maerki/work_ad_low_noise_float_2023_pybind11/.venv/lib/python3.12/site-packages/pybind11/include",
+                "-I/home/maerki/work/ad_low_noise_float_2023_pybind11/.venv/lib/python3.12/site-packages/pybind11/include",
                 // END
                 "-DMAIN",
                 "-g",
-                "src/dynamic_buffer.cpp",
+                "src/decoder.cpp",
                 "-o",
-                "bin/dynamic_buffer",
+                "bin/decoder",
                 // python pc/python_compile_parameters.py
                 "-I/usr/include/python3.12",
                 "-L/usr/lib/x86_64-linux-gnu",
@@ -34,7 +34,7 @@
             "problemMatcher": [
                 "$gcc"
             ],
-            "detail": "Task to build dynamic_buffer.cpp."
+            "detail": "Task to build ad_low_noise_float_2023_decoder.cpp."
         }
     ]
 }

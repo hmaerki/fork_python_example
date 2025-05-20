@@ -15,20 +15,20 @@ __version__ = "0.0.1"
 
 ext_modules = [
     Pybind11Extension(
-        "dynamic_buffer",
-        ["src/dynamic_buffer.cpp"],
+        "ad_low_noise_float_2023_decoder",
+        ["src/decoder.cpp"],
         # Example: passing in the version to the compiled code
         define_macros=[("VERSION_INFO", __version__)],
     ),
 ]
 
 setuptools.setup(
-    name="dynamic_buffer",
+    name="ad_low_noise_float_2023_decoder",
     version=__version__,
     author="Hans Maerki",
     author_email="buhtig.hans.maerki@ergoinfo.ch",
     url="https://github.com/petermaerki/ad_low_noise_float_2023_git/",
-    description="dynamic_buffer for ad_low_noise_float_2023_git",
+    description="ad_low_noise_float_2023_decoder",
     long_description="",
     ext_modules=ext_modules,
     # extras_require={"test": "pytest"},
